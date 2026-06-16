@@ -381,7 +381,7 @@
                 const qty = existingQtys[product.id] || '';
                 row.innerHTML = `
                     <td class="product-name">${product.name}</td>
-                    <td class="price">Bs. ${bsf.toFixed(2)}</td>
+                    <td class="price">$ ${bsf.toFixed(2)}</td>
                     <td class="price">$${usd}</td>
                     <td><input type="number" id="qty_${product.id}" class="qty-input" min="0" value="${qty || ''}" placeholder="0"
                         oninput="onQtyChange(this,${product.id})"></td>
@@ -420,9 +420,9 @@
                     <tr>
                         <td>${item.name}</td>
                         <td style="text-align:center">${item.qty}</td>
-                        <td style="text-align:right">Bs. ${item.unitBsF.toFixed(2)}</td>
+                        <td style="text-align:right">$ ${item.unitBsF.toFixed(2)}</td>
                         <td style="text-align:right">$${item.unitUSD}</td>
-                        <td style="text-align:right">Bs. ${item.subtotalBsF.toFixed(2)}</td>
+                        <td style="text-align:right">$ ${item.subtotalBsF.toFixed(2)}</td>
                         <td style="text-align:right">$${item.subtotalUSD}</td>
                     </tr>`;
             });
@@ -435,9 +435,9 @@
                         <tr>
                             <th>Producto</th>
                             <th style="text-align:center">Cant.</th>
-                            <th style="text-align:right">P. Unit. Bs.</th>
                             <th style="text-align:right">P. Unit. $</th>
-                            <th style="text-align:right">Subt. Bs.</th>
+                            <th style="text-align:right">P. Unit. $</th>
+                            <th style="text-align:right">Subt. $</th>
                             <th style="text-align:right">Subt. $</th>
                         </tr>
                     </thead>
@@ -445,7 +445,7 @@
                     <tfoot>
                         <tr class="grand-total">
                             <td colspan="4"><strong>TOTAL</strong></td>
-                            <td style="text-align:right"><strong>Bs. ${totalBsF.toFixed(2)}</strong></td>
+                            <td style="text-align:right"><strong>$ ${totalBsF.toFixed(2)}</strong></td>
                             <td style="text-align:right"><strong>$${totalUSD}</strong></td>
                         </tr>
                     </tfoot>
@@ -547,16 +547,16 @@
 
             doc.autoTable({
                 startY: y,
-                head: [['Producto', 'Cant.', 'P.Unit Bs.', 'P.Unit $', 'Subt. Bs.', 'Subt. $']],
+                head: [['Producto', 'Cant.', 'P.Unit $', 'P.Unit $', 'Subt. $', 'Subt. $']],
                 body: items.map(i => [
                     i.name, i.qty,
-                    'Bs. ' + i.unitBsF.toFixed(2),
+                    '$ ' + i.unitBsF.toFixed(2),
                     '$' + i.unitUSD,
-                    'Bs. ' + i.subtotalBsF.toFixed(2),
+                    '$ ' + i.subtotalBsF.toFixed(2),
                     '$' + i.subtotalUSD
                 ]),
                 foot: [[{ content: 'TOTAL', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
-                        'Bs. ' + totalBsF.toFixed(2), '$' + totalUSD]],
+                        '$ ' + totalBsF.toFixed(2), '$' + totalUSD]],
                 styles: { fontSize: 9, cellPadding: 3 },
                 headStyles: { fillColor: [26, 71, 42], textColor: 255, fontStyle: 'bold' },
                 footStyles: { fillColor: [26, 71, 42], textColor: 255, fontStyle: 'bold' },
@@ -576,7 +576,7 @@
             doc.setFont('helvetica', 'italic');
             doc.setFontSize(8);
             doc.setTextColor(120, 120, 120);
-            doc.text('Precios en Bs. calculados al tipo de cambio BCV vigente.', margin, finalY);
+            doc.text('Precios en $ calculados al tipo de cambio BCV vigente.', margin, finalY);
             doc.text('Esta cotización tiene validez de 3 días hábiles.', margin, finalY + 5);
             doc.text('FAVECA', pageW / 2, finalY + 12, { align: 'center' });
             doc.setLineWidth(0.3);
