@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
-         { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
 
         .header { background: linear-gradient(135deg, #1a472a 0%, #2d6b4f 100%); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -24,4 +24,572 @@
         .form-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
         .form-group input:focus { outline: none; border-color: #1a472a; }
 
-        .btn { width: 100%; padding: 12px; background: #1a472a; color: white; border: none; borde
+        .btn { width: 100%; padding: 12px; background: #1a472a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .btn:hover { background: #2d6b4f; }
+        .btn-secondary { background: #666; margin-top: 10px; }
+        .btn-secondary:hover { background: #555; }
+        .btn-small { padding: 10px 20px; width: auto; }
+        .btn-pdf { background: #1565C0; padding: 12px 25px; width: auto; }
+        .btn-pdf:hover { background: #0d47a1; }
+        .btn-clear { background: #e65100; padding: 12px 25px; width: auto; }
+        .btn-clear:hover { background: #bf360c; }
+        .btn-logout { background: #d32f2f; padding: 12px 25px; width: auto; }
+        .btn-logout:hover { background: #b71c1c; }
+
+        .error-message { color: #d32f2f; text-align: center; margin-top: 15px; font-size: 14px; }
+        .hidden { display: none; }
+
+        .admin-section { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .admin-section h2 { color: #1a472a; margin-bottom: 20px; border-bottom: 3px solid #1a472a; padding-bottom: 10px; }
+        .admin-controls { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .differential-group { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
+        .differential-group .form-group { flex: 1; min-width: 200px; }
+        .differential-group input { padding: 10px; }
+
+        .vendor-section { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .vendor-section h2 { color: #1a472a; margin-bottom: 20px; }
+
+        .discounts-section { background: #f0f7f3; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid #1a472a; }
+        .discounts-section h3 { color: #1a472a; margin-bottom: 15px; font-size: 16px; }
+        .discount-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .discount-item { display: flex; align-items: center; background: white; padding: 15px; border-radius: 6px; border: 2px solid #ddd; transition: all 0.3s; }
+        .discount-item:hover { border-color: #1a472a; background: #f5f9f7; }
+        .discount-item input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; }
+        .discount-item label { cursor: pointer; margin: 0; font-weight: normal; flex: 1; }
+
+        .products-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        .products-table thead { background: #1a472a; color: white; }
+        .products-table th, .products-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .products-table tbody tr:hover { background: #f5f9f7; }
+        .products-table th { font-weight: bold; font-size: 14px; }
+        .product-name { font-weight: bold; color: #1a472a; }
+        .price { font-weight: bold; font-size: 15px; color: #2d6b4f; }
+        .line-header { background: #e8f5e9; font-weight: bold; color: #1a472a; }
+        .line-header td { padding: 12px 15px; border: none; border-top: 2px solid #1a472a; border-bottom: 2px solid #1a472a; }
+
+        .qty-input { width: 65px; padding: 6px 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; text-align: center; transition: border-color 0.2s; }
+        .qty-input:focus { outline: none; border-color: #1a472a; }
+        .qty-input.has-qty { border-color: #1a472a; background: #f0f7f3; font-weight: bold; }
+
+        .order-panel { background: #f0f7f3; border: 2px solid #1a472a; border-radius: 10px; padding: 25px; margin-top: 30px; }
+        .order-panel h3 { color: #1a472a; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #1a472a; padding-bottom: 10px; }
+        .order-empty { color: #888; font-style: italic; text-align: center; padding: 20px; }
+        .order-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+        .order-table th { background: #1a472a; color: white; padding: 12px 15px; text-align: left; font-size: 13px; }
+        .order-table td { padding: 11px 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .order-table tbody tr:last-child td { border-bottom: none; }
+        .order-table .total-row td { background: #e8f5e9; font-weight: bold; font-size: 15px; border-top: 2px solid #1a472a; }
+        .order-table .grand-total td { background: #1a472a; color: white; font-weight: bold; font-size: 16px; }
+
+        .client-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .client-info .form-group { margin-bottom: 0; }
+        .client-info input { padding: 10px; font-size: 14px; }
+        .client-info label { font-size: 13px; }
+
+        .actions { text-align: center; margin-top: 25px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-btn { padding: 10px 20px; background: #ddd; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .nav-btn.active { background: #1a472a; color: white; }
+        .nav-btn:hover { background: #999; }
+
+        .discount-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .badge { background: #1a472a; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .badge-none { background: #aaa; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛏️ FAVECA</h1>
+        <p>Sistema de Cotización de Precios</p>
+    </div>
+
+    <div class="container">
+        <!-- LOGIN -->
+        <div id="loginSection" class="login-section">
+            <h2>Acceso al Sistema</h2>
+            <div class="form-group">
+                <label>Contraseña de Administrador:</label>
+                <input type="password" id="passwordInput" placeholder="Ingresa la contraseña" onkeydown="if(event.key==='Enter')loginAdmin()">
+            </div>
+            <button class="btn" onclick="loginAdmin()">Ingresar como Administrador</button>
+            <button class="btn btn-secondary" onclick="goToVendor()">Ir a Sección Vendedor</button>
+            <div id="loginError" class="error-message hidden"></div>
+        </div>
+
+        <!-- ADMINISTRADOR -->
+        <div id="adminSection" class="admin-section hidden">
+            <h2>⚙️ Panel de Administrador</h2>
+            <div class="admin-controls">
+                <h3 style="color:#1a472a;margin-bottom:15px;">Configurar Diferencial Cambiario</h3>
+                <div class="differential-group">
+                    <div class="form-group">
+                        <label>Diferencial Cambiario (Multiplicador):</label>
+                        <input type="number" id="differentialInput" value="1.25" step="0.01" min="0.01">
+                    </div>
+                    <button class="btn btn-small" onclick="saveDifferential()">Guardar Diferencial</button>
+                </div>
+                <div id="diffMessage" style="margin-top:10px;color:green;font-size:14px;"></div>
+            </div>
+            <div style="text-align:center;">
+                <button class="btn btn-logout" onclick="logoutAdmin()">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <!-- VENDEDOR -->
+        <div id="vendorSection" class="vendor-section hidden">
+            <div class="nav-buttons">
+                <button class="nav-btn active">📋 Cotizador</button>
+                <button class="nav-btn" onclick="logoutVendor()">🚪 Salir</button>
+            </div>
+
+            <h2>💰 Cotizador de Precios</h2>
+
+            <div class="discounts-section">
+                <h3>Selecciona los Descuentos Aplicables:</h3>
+                <div class="discount-options">
+                    <div class="discount-item">
+                        <input type="checkbox" id="discount20" onchange="updatePrices()">
+                        <label for="discount20">Más de 20 unidades</label>
+                    </div>
+                    <div class="discount-item">
+                        <input type="checkbox" id="discountCash" onchange="updatePrices()">
+                        <label for="discountCash">Pago de Contado Max 15 Días</label>
+                    </div>
+                </div>
+            </div>
+
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio $ Tasa BCV</th>
+                        <th>Precio % Dto. Especial</th>
+                        <th style="width:90px;">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTable"></tbody>
+            </table>
+
+            <div class="order-panel" id="orderPanel">
+                <h3>🛒 Pedido / Cotización</h3>
+                <div class="client-info">
+                    <div class="form-group">
+                        <label>Cliente / Empresa:</label>
+                        <input type="text" id="clientName" placeholder="Nombre del cliente">
+                    </div>
+                    <div class="form-group">
+                        <label>RIF / Cédula:</label>
+                        <input type="text" id="clientRif" placeholder="J-000000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="text" id="clientPhone" placeholder="+58 000-0000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Vendedor:</label>
+                        <input type="text" id="sellerName" placeholder="Nombre del vendedor">
+                    </div>
+                </div>
+                <div id="orderContent">
+                    <p class="order-empty">Agrega cantidades en la tabla para construir el pedido...</p>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-pdf btn-small" onclick="generatePDF()">📄 Descargar PDF</button>
+                <button class="btn btn-clear btn-small" onclick="clearOrder()">🗑️ Limpiar Pedido</button>
+                <button class="btn btn-logout btn-small" onclick="logoutVendor()">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "admin123";
+
+        const products = [
+            { id: 1,  line: "LÍNEA DE BOX",     name: "BEDBOX 78x188",                           priceSpecial:  73.00 },
+            { id: 2,  line: "LÍNEA DE BOX",     name: "BEDBOX 98x188",                           priceSpecial:  75.00 },
+            { id: 3,  line: "LÍNEA DE BOX",     name: "BEDBOX 98x198",                           priceSpecial:  79.00 },
+            { id: 4,  line: "LÍNEA DE BOX",     name: "BEDBOX 138x188",                          priceSpecial:  98.00 },
+            { id: 5,  line: "LÍNEA DE BOX",     name: "BEDBOX 158x188",                          priceSpecial: 118.00 },
+            { id: 6,  line: "LÍNEA DE BOX",     name: "JUEGO DE PATAS P/BEDBOX rectangular",     priceSpecial:  16.00 },
+            { id: 7,  line: "LÍNEA DE BOX",     name: "JUEGO DE PATAS P/BEDBOX 1.58X1.88",       priceSpecial:  24.00 },
+            { id: 8,  line: "LÍNEA DE LITERAS", name: "SEVILLA 100-140x190",                     priceSpecial: 212.00 },
+            { id: 9,  line: "LÍNEA DE LITERAS", name: "CAPRI 100-140x190",                       priceSpecial: 212.00 },
+            { id: 10, line: "LÍNEA DE LITERAS", name: "EXTRAFIRME 80x190",                       priceSpecial: 167.00 },
+            { id: 11, line: "LÍNEA DE LITERAS", name: "EXTRAFIRME 100x190",                      priceSpecial: 175.00 },
+            { id: 12, line: "LÍNEA DE LITERAS", name: "SEGOVIA 80x190",                          priceSpecial: 157.00 },
+            { id: 13, line: "LÍNEA DE LITERAS", name: "SEGOVIA 100x190",                         priceSpecial: 164.00 },
+            { id: 14, line: "LÍNEA DE LITERAS", name: "TRILITERA SEGOVIA 100x190",               priceSpecial: 237.00 },
+            { id: 15, line: "LÍNEA DE LITERAS", name: "INSTITUCIONAL 100x190",                   priceSpecial: 128.00 },
+            { id: 16, line: "LÍNEA DE CAMAS",   name: "SANDWICH DE TUBO 80x190",                 priceSpecial:  98.00 },
+            { id: 17, line: "LÍNEA DE CAMAS",   name: "SANDWICH DE TUBO 100x190",                priceSpecial: 112.00 },
+            { id: 18, line: "LÍNEA DE CAMAS",   name: "VICTORIA 80x190",                         priceSpecial:  86.00 },
+            { id: 19, line: "LÍNEA DE CAMAS",   name: "VICTORIA 100x190",                        priceSpecial:  97.00 },
+            { id: 20, line: "LÍNEA DE CAMAS",   name: "VICTORIA 140x190",                        priceSpecial: 139.00 },
+            { id: 21, line: "LÍNEA DE CAMAS",   name: "MODENA 100x190",                          priceSpecial:  74.00 },
+            { id: 22, line: "LÍNEA DE CAMAS",   name: "MODENA 140x190",                          priceSpecial: 111.00 },
+            { id: 23, line: "LÍNEA DE CAMAS",   name: "CLINICA 100x190",                         priceSpecial: 202.00 },
+            { id: 24, line: "LÍNEA DE CAMAS",   name: "DIVAN CAMA SOFIA CON COLCHON 70x180",     priceSpecial: 134.00 },
+            { id: 25, line: "JERGONES",          name: "TENS P/PLEG.C/RUEDAS P/TRILITERA 78x188", priceSpecial:  88.00 },
+            { id: 26, line: "JERGONES",          name: "TENS P/PLEG.C/RUEDAS P/TRILITERA 98x188", priceSpecial:  90.00 }
+        ];
+
+        let currentDifferential = parseFloat(localStorage.getItem('differential')) || 1.25;
+
+        // ── HELPERS ──────────────────────────────────────────────
+        function roundUSD(price) {
+            return Math.ceil(price);
+        }
+
+        function roundBsF(price) {
+            return Math.round(price * 100) / 100;
+        }
+
+        function getDiscount20()   { return document.getElementById('discount20').checked; }
+        function getDiscountCash() { return document.getElementById('discountCash').checked; }
+
+        // Col $ → aplica descuentos y redondea con Math.ceil
+        function calcUSD(base) {
+            let price = parseFloat(base);
+            if (getDiscount20())   price *= 0.95;
+            if (getDiscountCash()) price *= 0.90;
+            return roundUSD(price);
+        }
+
+        // Col BsF → deriva SIEMPRE del USD ya redondeado × factor
+        function calcBsFFromUSD(usd) {
+            return roundBsF(usd * currentDifferential);
+        }
+
+        function getActiveDiscounts() {
+            const d = [];
+            if (getDiscount20())   d.push('Más de 20 unidades');
+            if (getDiscountCash()) d.push('Pago de Contado Max 15 Días');
+            return d;
+        }
+
+        function getQty(productId) {
+            const el = document.getElementById('qty_' + productId);
+            return el ? (parseInt(el.value) || 0) : 0;
+        }
+
+        function formatDate() {
+            const d = new Date();
+            return d.toLocaleDateString('es-VE', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // ── AUTH ──────────────────────────────────────────────────
+        function loginAdmin() {
+            const pw = document.getElementById('passwordInput').value;
+            if (pw === ADMIN_PASSWORD) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminSection').classList.remove('hidden');
+                document.getElementById('differentialInput').value = currentDifferential;
+            } else {
+                document.getElementById('loginError').textContent = '❌ Contraseña incorrecta';
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function saveDifferential() {
+            const v = parseFloat(document.getElementById('differentialInput').value);
+            if (v > 0) {
+                currentDifferential = v;
+                localStorage.setItem('differential', v);
+                document.getElementById('diffMessage').textContent = '✅ Diferencial guardado correctamente';
+                setTimeout(() => document.getElementById('diffMessage').textContent = '', 3000);
+                if (!document.getElementById('vendorSection').classList.contains('hidden')) {
+                    renderProducts();
+                }
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function goToVendor() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('vendorSection').classList.remove('hidden');
+            renderProducts();
+        }
+
+        function logoutVendor() {
+            document.getElementById('vendorSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('passwordInput').value = '';
+            clearDiscounts();
+        }
+
+        function clearDiscounts() {
+            ['discount20', 'discountCash'].forEach(id => document.getElementById(id).checked = false);
+        }
+
+        function clearOrder() {
+            products.forEach(p => {
+                const el = document.getElementById('qty_' + p.id);
+                if (el) { el.value = ''; el.classList.remove('has-qty'); }
+            });
+            ['clientName', 'clientRif', 'clientPhone', 'sellerName'].forEach(id => document.getElementById(id).value = '');
+            renderOrder();
+        }
+
+        // ── RENDER TABLE ──────────────────────────────────────────
+        function renderProducts() {
+            const table = document.getElementById('productsTable');
+            const existingQtys = {};
+            products.forEach(p => { existingQtys[p.id] = getQty(p.id); });
+            table.innerHTML = '';
+            let lastLine = '';
+
+            products.forEach(product => {
+                if (product.line !== lastLine) {
+                    const lr = document.createElement('tr');
+                    lr.className = 'line-header';
+                    lr.innerHTML = `<td colspan="4">${product.line}</td>`;
+                    table.appendChild(lr);
+                    lastLine = product.line;
+                }
+                const row = document.createElement('tr');
+                // ✅ BsF se deriva del USD ya redondeado
+                const usd = calcUSD(product.priceSpecial);
+                const bsf = calcBsFFromUSD(usd);
+                const qty = existingQtys[product.id] || '';
+                row.innerHTML = `
+                    <td class="product-name">${product.name}</td>
+                    <td class="price">$ ${bsf.toFixed(2)}</td>
+                    <td class="price">$${usd}</td>
+                    <td><input type="number" id="qty_${product.id}" class="qty-input" min="0"
+                        value="${qty || ''}" placeholder="0"
+                        oninput="onQtyChange(this,${product.id})"></td>
+                `;
+                table.appendChild(row);
+            });
+            renderOrder();
+        }
+
+        function onQtyChange(el, productId) {
+            const v = parseInt(el.value) || 0;
+            el.classList.toggle('has-qty', v > 0);
+            renderOrder();
+        }
+
+        // ── RENDER ORDER ──────────────────────────────────────────
+        function getOrderItems() {
+            const items = [];
+            products.forEach(product => {
+                const qty = getQty(product.id);
+                if (qty > 0) {
+                    // ✅ BsF siempre derivado del USD ya redondeado
+                    const unitUSD = calcUSD(product.priceSpecial);
+                    const unitBsF = calcBsFFromUSD(unitUSD);
+                    items.push({
+                        name: product.name,
+                        qty,
+                        unitUSD,
+                        unitBsF,
+                        subtotalUSD: unitUSD * qty,
+                        subtotalBsF: roundBsF(unitBsF * qty)
+                    });
+                }
+            });
+            return items;
+        }
+
+        function renderOrder() {
+            const items = getOrderItems();
+            const container = document.getElementById('orderContent');
+            if (items.length === 0) {
+                container.innerHTML = '<p class="order-empty">Agrega cantidades en la tabla para construir el pedido...</p>';
+                return;
+            }
+
+            const discounts = getActiveDiscounts();
+            const badgesHtml = discounts.length > 0
+                ? discounts.map(d => `<span class="badge">${d}</span>`).join('')
+                : '<span class="badge-none">Sin descuentos</span>';
+
+            let totalBsF = 0, totalUSD = 0;
+            let rowsHtml = '';
+            items.forEach(item => {
+                totalBsF += item.subtotalBsF;
+                totalUSD += item.subtotalUSD;
+                rowsHtml += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td style="text-align:center">${item.qty}</td>
+                        <td style="text-align:right">$ ${item.unitBsF.toFixed(2)}</td>
+                        <td style="text-align:right">$${item.unitUSD}</td>
+                        <td style="text-align:right">$ ${item.subtotalBsF.toFixed(2)}</td>
+                        <td style="text-align:right">$${item.subtotalUSD}</td>
+                    </tr>`;
+            });
+
+            container.innerHTML = `
+                <div class="discount-badges" style="margin-bottom:15px;">${badgesHtml}</div>
+                <div style="overflow-x:auto;">
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th style="text-align:center">Cant.</th>
+                            <th style="text-align:right">P. Unit. BsF</th>
+                            <th style="text-align:right">P. Unit. $</th>
+                            <th style="text-align:right">Subt. BsF</th>
+                            <th style="text-align:right">Subt. $</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                    <tfoot>
+                        <tr class="grand-total">
+                            <td colspan="4"><strong>TOTAL</strong></td>
+                            <td style="text-align:right"><strong>$ ${roundBsF(totalBsF).toFixed(2)}</strong></td>
+                            <td style="text-align:right"><strong>$${totalUSD}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table></div>`;
+        }
+
+        function updatePrices() { renderProducts(); }
+
+        // ── PDF ───────────────────────────────────────────────────
+        function generatePDF() {
+            const items = getOrderItems();
+            if (items.length === 0) {
+                alert('Agrega al menos un producto con cantidad antes de generar el PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            const margin = 15;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.setTextColor(26, 71, 42);
+            doc.text('COTIZACIÓN DE PRECIOS', pageW / 2, 20, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text('FAVECA', pageW / 2, 27, { align: 'center' });
+
+            const cotNum = 'COT-' + Date.now().toString().slice(-6);
+            const fecha = formatDate();
+            doc.setFontSize(9);
+            doc.text('N°: ' + cotNum, pageW - margin, 13, { align: 'right' });
+            doc.text('Fecha: ' + fecha, pageW - margin, 19, { align: 'right' });
+
+            doc.setDrawColor(26, 71, 42);
+            doc.setLineWidth(0.8);
+            doc.line(margin, 32, pageW - margin, 32);
+
+            let y = 38;
+            const cn = document.getElementById('clientName').value || '—';
+            const cr = document.getElementById('clientRif').value || '—';
+            const cp = document.getElementById('clientPhone').value || '—';
+            const sn = document.getElementById('sellerName').value || '—';
+
+            doc.setFillColor(240, 247, 243);
+            doc.roundedRect(margin, y - 4, pageW - margin * 2, 22, 3, 3, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(26, 71, 42);
+            doc.text('DATOS DEL CLIENTE', margin + 3, y + 1);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(50, 50, 50);
+            y += 6;
+            doc.text('Cliente: ' + cn, margin + 3, y);
+            doc.text('RIF/CI: ' + cr, pageW / 2, y);
+            y += 5;
+            doc.text('Teléfono: ' + cp, margin + 3, y);
+            doc.text('Vendedor: ' + sn, pageW / 2, y);
+
+            y += 10;
+            const discounts = getActiveDiscounts();
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(26, 71, 42);
+            doc.text('Descuentos aplicados:', margin, y);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(50, 50, 50);
+            doc.text(discounts.length ? discounts.join(' | ') : 'Sin descuentos', margin + 42, y);
+
+            y += 6;
+            const totalBsF = roundBsF(items.reduce((s, i) => s + i.subtotalBsF, 0));
+            const totalUSD = items.reduce((s, i) => s + i.subtotalUSD, 0);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Producto', 'Cant.', 'P.Unit BsF', 'P.Unit $', 'Subt. BsF', 'Subt. $']],
+                body: items.map(i => [
+                    i.name, i.qty,
+                    '$ ' + i.unitBsF.toFixed(2),
+                    '$' + i.unitUSD,
+                    '$ ' + i.subtotalBsF.toFixed(2),
+                    '$' + i.subtotalUSD
+                ]),
+                foot: [[
+                    { content: 'TOTAL', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } },
+                    '$ ' + totalBsF.toFixed(2),
+                    '$' + totalUSD
+                ]],
+                styles: { fontSize: 9, cellPadding: 3 },
+                headStyles: { fillColor: [26, 71, 42], textColor: 255, fontStyle: 'bold' },
+                footStyles: { fillColor: [26, 71, 42], textColor: 255, fontStyle: 'bold' },
+                alternateRowStyles: { fillColor: [245, 249, 247] },
+                columnStyles: {
+                    0: { cellWidth: 'auto' },
+                    1: { halign: 'center', cellWidth: 13 },
+                    2: { halign: 'right', cellWidth: 26 },
+                    3: { halign: 'right', cellWidth: 22 },
+                    4: { halign: 'right', cellWidth: 26 },
+                    5: { halign: 'right', cellWidth: 22 }
+                },
+                margin: { left: margin, right: margin }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 8;
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Precios en $ calculados al tipo de cambio BCV vigente.', margin, finalY);
+            doc.text('Esta cotización tiene validez de 3 días hábiles.', margin, finalY + 5);
+            doc.text('FAVECA', pageW / 2, finalY + 12, { align: 'center' });
+            doc.setLineWidth(0.3);
+            doc.setDrawColor(26, 71, 42);
+            doc.line(margin, finalY + 15, pageW - margin, finalY + 15);
+
+            const fileName = 'FAVECA_Cotizacion_' + cotNum + '.pdf';
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isIOS) {
+                window.open(doc.output('datauristring'), '_blank');
+            } else if (isMobile) {
+                const blob = doc.output('blob');
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url; link.download = fileName;
+                document.body.appendChild(link); link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 3000);
+            } else {
+                const pdfData = doc.output('datauristring');
+                const link = document.createElement('a');
+                link.href = pdfData; link.download = fileName;
+                document.body.appendChild(link); link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Init
+        currentDifferential = parseFloat(localStorage.getItem('differential')) || 1.25;
+    </script>
+</body>
+</html>
